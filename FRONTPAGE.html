@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEN FITNESS ZONE - FITNESS TRACKER</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Verdana, sans-serif;
+        }
+
+        /* Video Background */
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        /* Body Styling */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        /* Logout Button with Shake on Hover */
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            padding: 10px 20px;
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease-in-out;
+            font-weight: bold;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-btn:hover {
+            background: darkred;
+            transform: scale(1.08);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            50% { transform: translateX(3px); }
+            75% { transform: translateX(-3px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Floating Content Box */
+        .content {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 1.5s ease-in-out, floatUp 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Heading Animation */
+        h1 {
+            font-size: 60px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: slideIn 1.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h5 {
+            font-size: 25px;
+            color: #90ee90;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Button with Pulsing Effect */
+        .btn {
+            display: inline-block;
+            font-size: 22px;
+            padding: 12px 30px;
+            background: DodgerBlue;
+            color: black;
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease-in-out;
+            font-weight: bold;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .btn:hover {
+            background: #76c776;
+            transform: scale(1.08);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(0, 0, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 0, 255, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(0, 0, 255, 0.5); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 40px;
+            }
+            h5 {
+                font-size: 20px;
+            }
+            .btn, .logout-btn {
+                font-size: 18px;
+                padding: 10px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Background -->
+    <video class="video-bg" autoplay loop muted>
+        <source src="girl.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Logout Button -->
+    <a href="LOGIN PAGE.html" class="logout-btn">Logout</a>
+
+    <div class="content">
+        <h1>ZEN FITNESS ZONE TRACKER</h1>
+        <h5><i>Welcome to our peaceful site.</i></h5>
+        <a href="LOGIN PAGE.html" class="btn">Get Started</a>
+    </div>
+</body>
+</html>

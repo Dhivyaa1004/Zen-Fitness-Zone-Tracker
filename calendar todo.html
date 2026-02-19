@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar and Workout Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            padding: 10px;
+        }
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            width: 90%;
+        }
+        .calendar-container, .todo-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px #00ffcc;
+            text-align: center;
+	    width: 60%;
+            transition: 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        .todo-container {
+            width: 800%;
+            max-width: 1000px;
+        }
+        #workoutInput {
+            width: 300%;
+            max-width: 300px;
+        }
+        #workoutList {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .calendar {
+            width: 300%;
+            max-width: 300px;
+        }
+        .calendar-container:hover, .todo-container:hover {
+            box-shadow: 0 0 15px #00ffcc;
+            transform: scale(1.05);
+            transition: 0.3s;
+        }
+        .chart-container {
+            display: block;
+            margin-top: 10px;
+            width: 55%;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px #ff00ff;
+            text-align: center;
+            transition: 0.3s;
+            opacity: 0;
+            animation: fadeInUp 1.5s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+        canvas {
+            max-width: 600px;
+            max-height: 650px;
+            margin: auto;
+        }
+        h1, h3 {
+            font-size: 1.8em;
+        }
+        input, button {
+            font-size: 1.2em;
+        }
+        ::placeholder {
+            font-size: 1.1em;
+        }
+        input[type="date"] {
+            font-size: 1.2em;
+            padding: 5px;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop id="background-video">
+        <source src="grp.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <h1>📅 CALENDAR & WORKOUT TRACKER 🏋️</h1>
+    <div class="container">
+        <div class="calendar-container">
+            <h3>📅 Calendar</h3>
+            <input type="date" id="workoutDate" class="calendar">
+        </div>
+        <div class="todo-container">
+            <h3>🏋️ Completed Workouts</h3>
+            <input type="text" id="workoutInput" placeholder="Add a workout">
+            <button onclick="addWorkout()">Add</button>
+            <ul id="workoutList"></ul>
+        </div>
+    </div>
+    <div class="chart-container" id="chartContainer">
+        <h3>📊 Workout Overview</h3>
+        <canvas id="workoutChart"></canvas>
+    </div>
+    <script>
+        let workoutData = JSON.parse(localStorage.getItem('workouts')) || {};
+        let colors = JSON.parse(localStorage.getItem('workoutColors')) || {};
+        let colorPalette = ["#FFD700", "#36A2EB", "#FF6384", "#4BC0C0", "#9966FF", "#FF9F40"];
+        let colorIndex = Object.keys(colors).length;
+        
+        function addWorkout() {
+            let input = document.getElementById("workoutInput");
+            let dateInput = document.getElementById("workoutDate").value;
+            let workout = input.value.trim();
+            let dateTime = dateInput ? `${dateInput} ${new Date().toLocaleTimeString()}` : new Date().toLocaleString();
+            
+            if (workout === "") return;
+            
+            let ul = document.getElementById("workoutList");
+            let li = document.createElement("li");
+            li.innerHTML = `${workout} <span style='font-size: 0.8em; color: gray;'>(${dateTime})</span> <span class='delete' onclick='removeWorkout(this, "${workout}", "${dateTime}")'>✖</span>`;
+            ul.appendChild(li);
+            
+            if (!Array.isArray(workoutData[workout])) {
+                workoutData[workout] = [];
+            }
+            workoutData[workout].push(dateTime);
+            
+            if (!colors[workout]) {
+                colors[workout] = colorPalette[colorIndex % colorPalette.length];
+                colorIndex++;
+            }
+            
+            localStorage.setItem('workouts', JSON.stringify(workoutData));
+            localStorage.setItem('workoutColors', JSON.stringify(colors));
+            updateChart();
+            input.value = "";
+        }
+        
+        function removeWorkout(element, workout, dateTime) {
+            element.parentElement.remove();
+            if (Array.isArray(workoutData[workout])) {
+                workoutData[workout] = workoutData[workout].filter(entry => entry !== dateTime);
+                if (workoutData[workout].length === 0) delete workoutData[workout];
+            }
+            localStorage.setItem('workouts', JSON.stringify(workoutData));
+            updateChart();
+        }
+        
+        function updateChart() {
+            let ctx = document.getElementById("workoutChart").getContext("2d");
+            if (window.workoutChartInstance) window.workoutChartInstance.destroy();
+            
+            window.workoutChartInstance = new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: Object.keys(workoutData),
+                    datasets: [{
+                        data: Object.keys(workoutData).map(workout => workoutData[workout].length),
+                        backgroundColor: Object.keys(workoutData).map(workout => colors[workout] || "#ddd"),
+                    }],
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: 'white',
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function loadWorkouts() {
+            let ul = document.getElementById("workoutList");
+            for (let workout in workoutData) {
+                if (Array.isArray(workoutData[workout])) {
+                    workoutData[workout].forEach(dateTime => {
+                        let li = document.createElement("li");
+                        li.innerHTML = `${workout} <span style='font-size: 0.8em; color: gray;'>(${dateTime})</span> <span class='delete' onclick='removeWorkout(this, "${workout}", "${dateTime}")'>✖</span>`;
+                        ul.appendChild(li);
+                    });
+                }
+            }
+            updateChart();
+        }
+        
+        window.onload = loadWorkouts;
+    </script>
+</body>
+</html>
